@@ -5,7 +5,6 @@ const tab = document.querySelector(".tab");
 let users = JSON.parse(localStorage.getItem("users")) || [];
 let items = JSON.parse(localStorage.getItem("items")) || [];
 
-// Initialize if not exists
 if (!localStorage.getItem("users")) {
     localStorage.setItem("users", JSON.stringify([]));
     users = [];
@@ -33,7 +32,7 @@ function showLoginForm() {
     userEmail.type = "email";
     userEmail.placeholder = "user123@gmail.com";
     userEmail.required = true;
-    tab.appendChild(userEmail);
+    mailLabel.appendChild(userEmail);
 
     const passLabel = document.createElement("label");
     passLabel.setAttribute("for", "password");
@@ -45,7 +44,7 @@ function showLoginForm() {
     userPassword.type = "password";
     userPassword.placeholder = "********";
     userPassword.required = true;
-    tab.appendChild(userPassword);
+    passLabel.appendChild(userPassword);
 
     const errorText = document.createElement("span");
     errorText.id = "errorText";
@@ -74,7 +73,7 @@ function showLoginForm() {
         if(existingUser) {
             sessionStorage.setItem("loggedInUser", JSON.stringify(existingUser));
             
-            // Redirect based on user type
+            // this time we are going to redirect them on different pages..
             if(existingUser.isAdmin) {
                 window.location.href = "admin.html";
             } else {
@@ -99,7 +98,7 @@ function showSignUpForm() {
     userName.type = "text";
     userName.placeholder = "Dominic Toretto";
     userName.required = true;
-    tab.appendChild(userName);
+    nameLabel.appendChild(userName);
 
     const mailLabel = document.createElement("label");
     mailLabel.setAttribute("for", "email");
@@ -111,7 +110,7 @@ function showSignUpForm() {
     userEmail.type = "email";
     userEmail.placeholder = "user123@gmail.com";
     userEmail.required = true;
-    tab.appendChild(userEmail);
+    mailLabel.appendChild(userEmail);
 
     const passLabel = document.createElement("label");
     passLabel.setAttribute("for", "password");
@@ -123,7 +122,7 @@ function showSignUpForm() {
     userPassword.type = "password";
     userPassword.placeholder = "********";
     userPassword.required = true;
-    tab.appendChild(userPassword);
+    passLabel.appendChild(userPassword);
 
     const adminLabel = document.createElement("label");
     adminLabel.setAttribute('for', 'chkAdmin');
@@ -177,16 +176,17 @@ function showSignUpForm() {
         users.push(newUser);
         localStorage.setItem("users", JSON.stringify(users));
 
-        errorText.innerText = "Signup Successful! You can now login.";
+        errorText.innerText = "Signup Successful! Redirecting to login page...";
         errorText.style.color = "green";
         
-        // Auto switch to login tab
-        loginTab.checked = true;
-        showLoginForm();
+        // after 2sec will redirect to login fotm
+        setTimeout(() => {
+            loginTab.checked = true;
+            showLoginForm();
+        }, 2000)
     });
 }
 
-// Event listeners
 loginTab.addEventListener("change", ()=> {
     if(loginTab.checked) showLoginForm();
 });
@@ -195,7 +195,6 @@ signUpTab.addEventListener("change", () => {
     if(signUpTab.checked) showSignUpForm();
 });
 
-// Initialize form on page load
 window.addEventListener('DOMContentLoaded', () => {
     if (loginTab.checked) {
         showLoginForm();
