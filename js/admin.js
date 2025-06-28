@@ -3,7 +3,6 @@ const itemsBox = document.querySelector(".items-box");
 const pagination = document.querySelector(".pagination");
 const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
 
-// Redirect if not admin or not logged in
 if(!loggedInUser || !loggedInUser.isAdmin) {
     window.location.href = "index.html";
 }
@@ -12,22 +11,24 @@ let items = JSON.parse(localStorage.getItem("items")) || [];
 const ITEMS_PER_PAGE = 12;
 let currentPage = 1;
 
-// Initialize UI
 function initUI() {
     // Navigation
     const heading = document.createElement("h1");
-    heading.textContent = `Welcome Admin ${loggedInUser.name}`;
+    heading.textContent = `Welcome ${loggedInUser.name}`;
     nav.appendChild(heading);
 
     const sideNav = document.createElement("div");
     
     const adminBadge = document.createElement("span");
     adminBadge.className = "admin-badge";
+    adminBadge.id = "admin-badge";
+    adminBadge.setAttribute("title", "Admin User");
     adminBadge.innerHTML = '<i class="fas fa-user-tie"></i> Admin';
     sideNav.appendChild(adminBadge);
 
     const logoutBtn = document.createElement("button");
     logoutBtn.className = "button button-danger";
+    logoutBtn.id = "logoutBtn";
     logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
     logoutBtn.addEventListener("click", () => {
         sessionStorage.removeItem("loggedInUser");
@@ -38,10 +39,10 @@ function initUI() {
 
     // Admin controls
     const upperDiv = document.createElement("div");
-    upperDiv.className = "upper-div";
+    upperDiv.classList.add("upper-div");
 
     const inputsBox = document.createElement("div");
-    inputsBox.className = "inputs";
+    inputsBox.classList.add("inputs");
 
     const nameBox = document.createElement("input");
     nameBox.id = "nameBox";
@@ -61,7 +62,6 @@ function initUI() {
     priceBox.type = "number";
     priceBox.placeholder = "Price";
     priceBox.min = "1";
-    priceBox.step = "0.01";
     priceBox.required = true;
 
     const descBox = document.createElement("input");
@@ -76,17 +76,55 @@ function initUI() {
     inputsBox.appendChild(descBox);
 
     const buttonsBox = document.createElement("div");
-    buttonsBox.className = "Buttons";
+    buttonsBox.classList.add("Buttons");
 
     const addBtn = document.createElement("button");
     addBtn.className = "button button-success";
+    addBtn.id = "addBtn";
     addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Item';
+
     addBtn.addEventListener("click", addItem);
+    // addBtn.addEventListener("click", ()=> {
+    //     if(!nameBox.value.trim() || isNaN(quanBox.value) || isNaN(priceBox.value) || !descBox.value.trim() ) {
+    //         alert("Please fill all fields with valid values");
+    //         return;
+    //     }
+    //     const existingItem = items.find(item => item.name.toLowerCase() === nameBox.value.trim().toLowerCase());
+
+    //     if (existingItem) {
+    //         existingItem.quantity += parseInt(quanBox.value);
+    //         localStorage.setItem("items", JSON.stringify(items));
+    //         lowerDiv.innerHTML = "";  
+    //         items.forEach(i => addToDom(i, lowerDiv));
+    //         alert(`Because item already exists so updated quantity of "${nameInput}" by ${quanInput}.`);
+    //     } else {
+    //         const newItem = {
+    //             id: Date.now(),
+    //             name: nameBox.value.trim(),
+    //             quantity: parseInt(quanBox.value),
+    //             price: parseInt(priceBox.value),
+    //             description: descBox.value.trim()
+    //         };
+    //         items.push(newItem);
+    //         localStorage.setItem("items", JSON.stringify(items));
+    //         lowerDiv.innerHTML = "";
+    //         items.forEach(i => addToDom(i, lowerDiv, items));
+    //     }
+
+    //     nameBox.value = '';
+    //     quanBox.value = '';
+    //     priceBox.value = '';
+    //     descBox.value = '';
+    // })
     buttonsBox.appendChild(addBtn);
 
     upperDiv.appendChild(inputsBox);
     upperDiv.appendChild(buttonsBox);
     itemsBox.appendChild(upperDiv);
+
+    // items.forEach(item => {
+    //     addToDom(item, lowerDiv);
+    // })
 
     renderItems();
 }

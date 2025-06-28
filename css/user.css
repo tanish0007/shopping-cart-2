@@ -1,55 +1,140 @@
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Navigation Styles */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.nav h1 {
+    font-size: 24px;
+    color: #2c3e50;
+}
+
 .user-actions {
     display: flex;
-    gap: 1rem;
+    gap: 15px;
+}
+
+/* Button Styles */
+.button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #2980b9;
+}
+
+.button-danger {
+    background-color: #e74c3c;
+}
+
+.button-danger:hover {
+    background-color: #c0392b;
+}
+
+/* Items Box Styles */
+.items-box {
+    min-height: 500px;
+}
+
+.no-items {
+    text-align: center;
+    font-size: 18px;
+    color: #7f8c8d;
+    padding: 50px 0;
 }
 
 .items-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-    width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
 }
 
+/* Item Card Styles */
 .item-card {
-    background-color: #f9f9f9;
+    background-color: white;
     border-radius: 8px;
-    padding: 1rem;
-    position: relative;
-    transition: transform 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
 }
 
 .item-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .item-image {
-    height: 200px;
-    background-color: #eee;
-    border-radius: 5px;
-    margin-bottom: 1rem;
+    height: 180px;
+    background-color: #3498db;
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #777;
+    font-size: 48px;
+    font-weight: bold;
 }
 
 .item-details {
-    margin-bottom: 1rem;
+    padding: 20px;
+    flex-grow: 1;
 }
 
 .item-details h3 {
-    margin-bottom: 0.5rem;
-    color: #333;
+    margin-bottom: 10px;
+    color: #2c3e50;
 }
 
 .item-price {
+    font-size: 20px;
     font-weight: bold;
-    color: #8a2be2;
-    margin: 0.5rem 0;
+    color: #27ae60;
+    margin-bottom: 10px;
+}
+
+.item-details p {
+    color: #7f8c8d;
+    margin-bottom: 15px;
 }
 
 .item-actions {
+    padding: 0 20px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -58,33 +143,95 @@
 .wishlist-btn {
     background: none;
     border: none;
-    font-size: 1.2rem;
+    font-size: 20px;
+    color: #bdc3c7;
     cursor: pointer;
-    color: #ccc;
-    transition: color 0.3s ease;
+    transition: color 0.3s;
 }
 
-.wishlist-btn.active {
-    color: red;
+.wishlist-btn.active, 
+.wishlist-btn:hover {
+    color: #e74c3c;
 }
 
 .add-to-cart {
-    padding: 0.5rem 1rem;
-    background-color: #8a2be2;
+    padding: 8px 12px;
+    background-color: #27ae60;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .add-to-cart:hover {
-    background-color: #7b1fa2;
+    background-color: #219955;
 }
 
-.cart-items, .wishlist-items {
-    display: none;
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
 }
 
-.cart-items.active, .wishlist-items.active {
-    display: block;
+.pagination button {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.pagination button.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .nav {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .user-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .items-container {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .items-container {
+        grid-template-columns: 1fr;
+    }
+
+    .item-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .button {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
 }
