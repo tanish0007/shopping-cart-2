@@ -8,31 +8,32 @@ if(!loggedInUser || !loggedInUser.isAdmin) {
 }
 
 let items = JSON.parse(localStorage.getItem("items")) || [];
+if (!localStorage.getItem("items")) {
+    localStorage.setItem("items", JSON.stringify([]));
+    items = [];
+}
 
 function getItemsPerPage() {
-    if (window.innerWidth <= 480) { // Mobile
-        return 2;
-    } else if (window.innerWidth <= 768) { // Tablet
-        return 4;
-    } else if (window.innerWidth <= 1024) { // Small desktop
-        return 6;
-    } else { // Large desktop
-        return 8;
-    }
+    if (window.innerWidth <= 480) return 2;    // Mobile
+    if (window.innerWidth <= 768) return 4;    // Tablet
+    if (window.innerWidth <= 1024) return 6;
+    return 8;                                  // Desktop
 }
 
 let ITEMS_PER_PAGE = getItemsPerPage();
 let currentPage = 1;
 
+// Initialize UI
 function initUI() {
     window.addEventListener("resize", () => {
         ITEMS_PER_PAGE = getItemsPerPage();
         currentPage = 1;
         renderItems();
-    })
+    });
+
     // Navigation
     const heading = document.createElement("h1");
-    heading.textContent = `Welcome ${loggedInUser.name}`;
+    heading.innerHTML = `Welcome ${loggedInUser.name}`;
     nav.appendChild(heading);
 
     const sideNav = document.createElement("div");
@@ -55,7 +56,10 @@ function initUI() {
     sideNav.appendChild(logoutBtn);
     nav.appendChild(sideNav);
 
-    // Admin controls
+    renderAdminInterface();
+}
+
+function renderAdminInterface() {
     const upperDiv = document.createElement("div");
     upperDiv.classList.add("upper-div");
 
@@ -100,97 +104,49 @@ function initUI() {
     addBtn.className = "button button-success";
     addBtn.id = "addBtn";
     addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Item';
+    addBtn.addEventListener("click", () => {
+        const existingUpdNow = document.querySelector("#updNowBtn");
+        if (existingUpdNow) existingUpdNow.remove();
 
-    addBtn.addEventListener("click", addItem);
-    // addBtn.addEventListener("click", ()=> {
-    //     if(!nameBox.value.trim() || isNaN(quanBox.value) || isNaN(priceBox.value) || !descBox.value.trim() ) {
-    //         alert("Please fill all fields with valid values");
-    //         return;
-    //     }
-    //     const existingItem = items.find(item => item.name.toLowerCase() === nameBox.value.trim().toLowerCase());
+        if(!nameBox.value.trim() || isNaN(quanBox.value) || isNaN(priceBox.value) || !descBox.value.trim()) {
+            alert("Please fill all fields with valid values");
+            return;
+        }
 
-    //     if (existingItem) {
-    //         existingItem.quantity += parseInt(quanBox.value);
-    //         localStorage.setItem("items", JSON.stringify(items));
-    //         lowerDiv.innerHTML = "";  
-    //         items.forEach(i => addToDom(i, lowerDiv));
-    //         alert(`Because item already exists so updated quantity of "${nameInput}" by ${quanInput}.`);
-    //     } else {
-    //         const newItem = {
-    //             id: Date.now(),
-    //             name: nameBox.value.trim(),
-    //             quantity: parseInt(quanBox.value),
-    //             price: parseInt(priceBox.value),
-    //             description: descBox.value.trim()
-    //         };
-    //         items.push(newItem);
-    //         localStorage.setItem("items", JSON.stringify(items));
-    //         lowerDiv.innerHTML = "";
-    //         items.forEach(i => addToDom(i, lowerDiv, items));
-    //     }
+        const existingItem = items.find(item => item.name.toLowerCase() === nameBox.value.trim().toLowerCase());
 
-    //     nameBox.value = '';
-    //     quanBox.value = '';
-    //     priceBox.value = '';
-    //     descBox.value = '';
-    // })
+        if (existingItem) {
+            existingItem.quantity += parseInt(quanBox.value);
+            localStorage.setItem("items", JSON.stringify(items));
+            renderItems();
+            alert(`Item already exists. Quantity increased by ${quanBox.value}`);
+        } else {
+            const newItem = {
+                id: Date.now(),
+                name: nameBox.value.trim(),
+                quantity: parseInt(quanBox.value),
+                price: parseInt(priceBox.value),
+                description: descBox.value.trim()
+            };
+            items.push(newItem);
+            localStorage.setItem("items", JSON.stringify(items));
+            renderItems();
+        }
+
+        nameBox.value = '';
+        quanBox.value = '';
+        priceBox.value = '';
+        descBox.value = '';
+    });
     buttonsBox.appendChild(addBtn);
 
     upperDiv.appendChild(inputsBox);
     upperDiv.appendChild(buttonsBox);
     itemsBox.appendChild(upperDiv);
 
-    // items.forEach(item => {
-    //     addToDom(item, lowerDiv);
-    // })
-
     renderItems();
 }
 
-// Add new item
-function addItem() {
-    const nameInput = document.querySelector("#nameBox").value.trim();
-    const quanInput = parseInt(document.querySelector("#quanBox").value);
-    const priceInput = parseFloat(document.querySelector("#priceBox").value);
-    const descInput = document.querySelector("#descBox").value.trim();
-
-    if(!nameInput || isNaN(quanInput) || isNaN(priceInput) || !descInput) {
-        alert("Please fill all fields with valid values");
-        return;
-    }
-
-    if(nameInput === "") {
-        alert("Item name cannot be empty");
-        return;
-    }
-
-    const existingItem = items.find(item => item.name.toLowerCase() === nameInput.toLowerCase());
-
-    if(existingItem) {
-        existingItem.quantity += quanInput;
-        alert(`Item already exists. Quantity increased by ${quanInput}`);
-    } else {
-        const newItem = {
-            id: Date.now(),
-            name: nameInput,
-            quantity: quanInput,
-            price: priceInput,
-            description: descInput
-        };
-        items.push(newItem);
-    }
-
-    localStorage.setItem("items", JSON.stringify(items));
-    renderItems();
-    
-    // Clear inputs
-    document.querySelector("#nameBox").value = '';
-    document.querySelector("#quanBox").value = '';
-    document.querySelector("#priceBox").value = '';
-    document.querySelector("#descBox").value = '';
-}
-
-// Render items with pagination
 function renderItems() {
     const lowerDiv = document.createElement("div");
     lowerDiv.className = "lower-div";
@@ -208,47 +164,7 @@ function renderItems() {
         lowerDiv.textContent = "No items found";
     } else {
         paginatedItems.forEach(item => {
-            const itemDiv = document.createElement("div");
-            itemDiv.className = "item";
-            itemDiv.setAttribute("data-id", item.id);
-
-            const ul = document.createElement("ul");
-
-            const nameLi = document.createElement("li");
-            nameLi.innerHTML = `<strong>Name:</strong> ${item.name}`;
-            ul.appendChild(nameLi);
-
-            const quanLi = document.createElement("li");
-            quanLi.innerHTML = `<strong>Quantity:</strong> ${item.quantity}`;
-            ul.appendChild(quanLi);
-
-            const priceLi = document.createElement("li");
-            priceLi.innerHTML = `<strong>Price:</strong> $${item.price.toFixed(2)}`;
-            ul.appendChild(priceLi);
-
-            const descLi = document.createElement("li");
-            descLi.innerHTML = `<strong>Description:</strong> ${item.description}`;
-            ul.appendChild(descLi);
-
-            itemDiv.appendChild(ul);
-
-            const btnBox = document.createElement("div");
-            btnBox.className = "button-box";
-
-            const delBtn = document.createElement("button");
-            delBtn.className = "button button-danger";
-            delBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
-            delBtn.addEventListener("click", () => deleteItem(item.id));
-            btnBox.appendChild(delBtn);
-
-            const editBtn = document.createElement("button");
-            editBtn.className = "button";
-            editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
-            editBtn.addEventListener("click", () => editItem(item.id));
-            btnBox.appendChild(editBtn);
-
-            itemDiv.appendChild(btnBox);
-            lowerDiv.appendChild(itemDiv);
+            addToDom(item, lowerDiv);
         });
     }
 
@@ -256,75 +172,177 @@ function renderItems() {
     renderPagination(totalPages);
 }
 
-// Delete item
-function deleteItem(id) {
-    if(!confirm("Are you sure you want to delete this item?")) return;
-    
-    items = items.filter(item => item.id !== id);
-    localStorage.setItem("items", JSON.stringify(items));
-    renderItems();
-}
+function addToDom(item, container) {
+    const div = document.createElement("div");
+    div.setAttribute("id", item.id);
+    div.classList.add("item");
 
-// Edit item
-function editItem(id) {
-    const item = items.find(item => item.id === id);
-    if(!item) return;
+    const ul = document.createElement("ul");
 
-    // Fill form with item data
-    document.querySelector("#nameBox").value = item.name;
-    document.querySelector("#quanBox").value = item.quantity;
-    document.querySelector("#priceBox").value = item.price;
-    document.querySelector("#descBox").value = item.description;
+    const nameLi = document.createElement("li");
+    nameLi.classList.add("itemName");
+    nameLi.innerHTML = `<strong>Name:</strong> ${item.name}`;
+    ul.appendChild(nameLi);
 
-    // Change add button to update button
-    const addBtn = document.querySelector(".Buttons button");
-    addBtn.innerHTML = '<i class="fas fa-save"></i> Update Item';
-    addBtn.onclick = function() {
-        updateItem(id);
-    };
-}
+    const quanLi = document.createElement("li");
+    quanLi.classList.add("itemQuantity");
+    quanLi.innerHTML = `<strong>Quantity:</strong> ${item.quantity}`;
+    ul.appendChild(quanLi);
 
-// Update item
-function updateItem(id) {
-    const nameInput = document.querySelector("#nameBox").value.trim();
-    const quanInput = parseInt(document.querySelector("#quanBox").value);
-    const priceInput = parseFloat(document.querySelector("#priceBox").value);
-    const descInput = document.querySelector("#descBox").value.trim();
+    const priceLi = document.createElement("li");
+    priceLi.classList.add("itemPrice");
+    priceLi.innerHTML = `<strong>Price:</strong> $${item.price.toFixed(2)}`;
+    ul.appendChild(priceLi);
 
-    if(!nameInput || isNaN(quanInput) || isNaN(priceInput) || !descInput) {
-        alert("Please fill all fields with valid values");
-        return;
-    }
+    const descLi = document.createElement("li");
+    descLi.classList.add("itemDesc");
+    descLi.innerHTML = `<strong>Description:</strong> ${item.description}`;
+    ul.appendChild(descLi);
 
-    items = items.map(item => {
-        if(item.id === id) {
-            return {
-                ...item,
-                name: nameInput,
-                quantity: quanInput,
-                price: priceInput,
-                description: descInput
-            };
-        }
-        return item;
+    div.appendChild(ul);
+
+    const btnBox = document.createElement("div");
+    btnBox.classList.add("button-box");
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "button button-danger";
+    delBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+    delBtn.addEventListener("click", () => {
+        const confirmDelete = confirm(`Are you sure you want to delete "${item.name}"?`);
+        if (!confirmDelete) return;
+
+        items = items.filter(i => i.id !== item.id);
+        localStorage.setItem("items", JSON.stringify(items));
+        div.remove();
+
+        // clear all inputs
+        document.querySelector("#nameBox").value = '';
+        document.querySelector("#quanBox").value = '';
+        document.querySelector("#priceBox").value = '';
+        document.querySelector("#descBox").value = '';
     });
+    btnBox.appendChild(delBtn);
 
-    localStorage.setItem("items", JSON.stringify(items));
-    
-    // Reset form and button
-    document.querySelector("#nameBox").value = '';
-    document.querySelector("#quanBox").value = '';
-    document.querySelector("#priceBox").value = '';
-    document.querySelector("#descBox").value = '';
+    const editBtn = document.createElement("button");
+    editBtn.className = "button";
+    editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
+    editBtn.addEventListener("click", () => {
+        const confirmUpdate = confirm(`Are you sure you want to update "${item.name}"?`);
+        if (!confirmUpdate) return;
 
-    const addBtn = document.querySelector(".Buttons button");
-    addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Item';
-    addBtn.onclick = addItem;
+        // Pre-fill the admin input fields
+        document.querySelector("#nameBox").value = item.name;
+        document.querySelector("#quanBox").value = item.quantity;
+        document.querySelector("#priceBox").value = item.price;
+        document.querySelector("#descBox").value = item.description;
 
-    renderItems();
+        // Remove existing Update Now button if any
+        const existingUpdNow = document.querySelector("#updNowBtn");
+        if (existingUpdNow) existingUpdNow.remove();
+
+        // Disable Add Item button
+        const addBtn = document.querySelector("#addBtn");
+        if (addBtn) {
+            addBtn.disabled = true;
+            addBtn.style.cursor = "not-allowed";
+        }
+
+        // Disable Logout button
+        const logoutBtn = document.querySelector("#logoutBtn") 
+        if (logoutBtn) {
+            logoutBtn.disabled = true;
+            logoutBtn.style.cursor = "not-allowed";
+        }
+
+        // disable other Delete buttons too..
+        const allDelBtns = document.querySelectorAll(".button-danger");
+        if(allDelBtns){
+            allDelBtns.forEach(button => {
+                button.disabled = true;
+                button.style.cursor = "not-allowed";
+            })
+        }
+
+        // Creating Update Now Button
+        const updNow = document.createElement("button");
+        updNow.id = "updNowBtn";
+        updNow.className = "button button-success";
+        updNow.innerHTML = '<i class="fas fa-save"></i> Update Now';
+        document.querySelector(".Buttons").appendChild(updNow);
+
+        updNow.addEventListener("click", () => {
+            let changed = false;
+            const nameInput = document.querySelector("#nameBox").value.trim();
+            const quanInput = parseInt(document.querySelector("#quanBox").value);
+            const priceInput = parseFloat(document.querySelector("#priceBox").value);
+            const descInput = document.querySelector("#descBox").value.trim();
+
+            if (nameInput === "") {
+                alert("Item name cannot be empty or just spaces. Please enter a valid name.");
+                return;
+            }
+
+            items = items.map(elem => {
+                if (elem.id === item.id) {
+                    if (elem.name !== nameInput && nameInput) {
+                        elem.name = nameInput;
+                        changed = true;
+                    }
+                    if (elem.quantity !== quanInput && quanInput) {
+                        elem.quantity = quanInput;
+                        changed = true;
+                    }
+                    if (elem.price !== priceInput && priceInput) {
+                        elem.price = priceInput;
+                        changed = true;
+                    }
+                    if (elem.description !== descInput && descInput) {
+                        elem.description = descInput;
+                        changed = true;
+                    }
+                }
+                return elem;
+            });
+
+            if (changed) {
+                localStorage.setItem("items", JSON.stringify(items));
+                renderItems();
+                updNow.remove();
+            } else {
+                alert("No changes were made");
+            }
+
+            // Re-enable buttons
+            if (addBtn) {
+                addBtn.disabled = false;
+                addBtn.style.cursor = "pointer";
+                addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Item';
+            }
+            if (logoutBtn) {
+                logoutBtn.disabled = false;
+                logoutBtn.style.cursor = "pointer";
+            }
+            if(allDelBtns){
+                allDelBtns.forEach(button => {
+                    button.disabled = false;
+                    button.style.cursor = "pointer";
+                })
+            }
+
+            updNow.remove();
+
+            document.querySelector("#nameBox").value = '';
+            document.querySelector("#quanBox").value = '';
+            document.querySelector("#priceBox").value = '';
+            document.querySelector("#descBox").value = '';
+        });
+    });
+    btnBox.appendChild(editBtn);
+
+    div.appendChild(btnBox);
+    container.appendChild(div);
 }
 
-// Render pagination buttons
 function renderPagination(totalPages) {
     pagination.innerHTML = '';
 
@@ -332,6 +350,7 @@ function renderPagination(totalPages) {
 
     // Previous button
     const prevBtn = document.createElement("button");
+    prevBtn.className = "pagination-btn";
     prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
     prevBtn.disabled = currentPage === 1;
     prevBtn.addEventListener("click", () => {
@@ -343,10 +362,36 @@ function renderPagination(totalPages) {
     pagination.appendChild(prevBtn);
 
     // Page buttons
-    for(let i = 1; i <= totalPages; i++) {
+    const maxVisible = 5;
+    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(totalPages, start + maxVisible - 1);
+
+    if (end - start + 1 < maxVisible) {
+        start = Math.max(1, end - maxVisible + 1);
+    }
+
+    if (start > 1) {
+        const firstBtn = document.createElement("button");
+        firstBtn.className = "pagination-btn";
+        firstBtn.textContent = "1";
+        firstBtn.addEventListener("click", () => {
+            currentPage = 1;
+            renderItems();
+        });
+        pagination.appendChild(firstBtn);
+
+        if (start > 2) {
+            const ellipsis = document.createElement("span");
+            ellipsis.className = "pagination-ellipsis";
+            ellipsis.textContent = "...";
+            pagination.appendChild(ellipsis);
+        }
+    }
+
+    for (let i = start; i <= end; i++) {
         const pageBtn = document.createElement("button");
+        pageBtn.className = `pagination-btn ${currentPage === i ? "active" : ""}`;
         pageBtn.textContent = i;
-        pageBtn.className = currentPage === i ? "active" : "";
         pageBtn.addEventListener("click", () => {
             currentPage = i;
             renderItems();
@@ -354,8 +399,27 @@ function renderPagination(totalPages) {
         pagination.appendChild(pageBtn);
     }
 
+    if (end < totalPages) {
+        if (end < totalPages - 1) {
+            const ellipsis = document.createElement("span");
+            ellipsis.className = "pagination-ellipsis";
+            ellipsis.textContent = "...";
+            pagination.appendChild(ellipsis);
+        }
+
+        const lastBtn = document.createElement("button");
+        lastBtn.className = "pagination-btn";
+        lastBtn.textContent = totalPages;
+        lastBtn.addEventListener("click", () => {
+            currentPage = totalPages;
+            renderItems();
+        });
+        pagination.appendChild(lastBtn);
+    }
+
     // Next button
     const nextBtn = document.createElement("button");
+    nextBtn.className = "pagination-btn";
     nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
     nextBtn.disabled = currentPage === totalPages;
     nextBtn.addEventListener("click", () => {
