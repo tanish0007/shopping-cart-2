@@ -36,7 +36,7 @@ function initUI() {
 
     // Navigation
     const heading = document.createElement("h1");
-    heading.innerHTML = `Welcome ${loggedInUser.name || 'User'}`;
+    heading.innerHTML = `<i class="fas fa-user-circle"></i> Welcome ${loggedInUser.name || 'User'}`;
     nav.appendChild(heading);
 
     const sideNav = document.createElement("div");
@@ -48,7 +48,7 @@ function initUI() {
     
     const wishlistBtn = document.createElement("button");
     wishlistBtn.className = `button ${showingWishlist ? 'active' : ''}`;
-    wishlistBtn.innerHTML = '<i class="fas fa-heart"></i>';
+    wishlistBtn.innerHTML = '<i class="fas fa-heart"></i> Wishlist';
     wishlistBtn.addEventListener("click", toggleWishlist);
     wishlistBtnContainer.appendChild(wishlistBtn);
     
@@ -64,7 +64,7 @@ function initUI() {
     
     const cartBtn = document.createElement("button");
     cartBtn.className = `button ${showingCart ? 'active' : ''}`;
-    cartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i>';
+    cartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Cart';
     cartBtn.addEventListener("click", toggleCart);
     cartBtnContainer.appendChild(cartBtn);
     
@@ -109,8 +109,8 @@ function toggleCart() {
 
 // Update nav buttons state
 function updateNavButtons() {
-    const wishlistBtn = document.querySelector('.side-nav .fa-heart').parentElement;
-    const cartBtn = document.querySelector('.side-nav .fa-shopping-cart').parentElement;
+    const wishlistBtn = document.querySelector('.side-nav .fa-heart').closest('button');
+    const cartBtn = document.querySelector('.side-nav .fa-shopping-cart').closest('button');
     
     wishlistBtn.classList.toggle('active', showingWishlist);
     cartBtn.classList.toggle('active', showingCart);
@@ -145,7 +145,13 @@ function renderItems() {
         itemsToDisplay = [...items];
     }
 
-    const totalPages = Math.ceil(itemsToDisplay.length / ITEMS_PER_PAGE);
+    let totalPages = Math.ceil(itemsToDisplay.length / ITEMS_PER_PAGE);
+    if (totalPages === 0) totalPages = 1; // Always at least 1 page
+    
+    // Ensure currentPage is within valid range
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+    
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const paginatedItems = itemsToDisplay.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
@@ -172,6 +178,14 @@ function addToDom(item, container) {
     div.classList.add("item");
 
     const ul = document.createElement("ul");
+
+    const imageLi = document.createElement("li");
+    imageLi.classList.add("itemImage");
+    const img = document.createElement("img");
+    img.src = item.image || "https://via.placeholder.com/150?text=No+Image";
+    img.alt = item.name;
+    imageLi.appendChild(img);
+    ul.appendChild(imageLi);
 
     const nameLi = document.createElement("li");
     nameLi.classList.add("itemName");
@@ -240,6 +254,7 @@ function toggleWishlistItem(itemId) {
     }
     updateUserData();
     updateNavCounters();
+    renderItems(); // Force UI refresh
 }
 
 // Add item to cart
@@ -264,7 +279,7 @@ function addToCart(itemId) {
         }
     }
     
-    renderItems();
+    renderItems(); // Force UI refresh
 }
 
 // Remove item from cart
@@ -272,7 +287,7 @@ function removeFromCart(itemId) {
     loggedInUser.cart = loggedInUser.cart.filter(item => item.id !== itemId);
     updateUserData();
     updateNavCounters();
-    renderItems();
+    renderItems(); // Force UI refresh
 }
 
 // Update user data
