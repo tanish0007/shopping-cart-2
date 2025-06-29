@@ -1,5 +1,5 @@
 /* Admin Dashboard Styles */
-@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
 :root {
@@ -47,7 +47,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem;
+  padding: 1.25rem 3rem;
   background-color: var(--primary-color);
   color: var(--white);
   flex-wrap: wrap;
@@ -55,10 +55,14 @@ body {
 }
 
 .nav h1 {
-  font-size: 1.8rem;
+  font-size: 2.5rem;
   font-weight: 600;
   margin: 0;
+  font-family: "Great Vibes";
   color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav > div {
@@ -70,10 +74,12 @@ body {
 }
 
 .admin-badge {
-  background-color: rgba(255, 255, 255, 0.2);
-  padding: 0.5rem 1rem;
+  border: 1px dashed white;
+  color: white;
+  padding: 2px 10px;
   border-radius: 20px;
-  font-size: 0.9rem;
+  font-size: 12px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -104,18 +110,18 @@ body {
 }
 
 .button-danger:hover {
-  background-color: #c0392b;
-  box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+  background-color: #f3321c;
+  box-shadow: 0 0 10px rgb(235, 54, 34);
 }
-
 .button-success {
-  background-color: var(--success-color);
+  background-color: #2ecc71;
+  border: none;
   color: var(--white);
 }
 
 .button-success:hover {
-  background-color: #27ae60;
-  box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+  background-color: #13d664;
+  box-shadow: 0 0 20px #13d664;
 }
 
 /* Admin Controls */
@@ -137,6 +143,7 @@ body {
   border-radius: 5px;
   font-size: 1rem;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.212);
   width: 100%;
 }
 
@@ -148,9 +155,23 @@ body {
 
 .Buttons {
   display: flex;
+  gap: 20px;
   justify-content: flex-end;
 }
-
+.Buttons button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+.Buttons button:disabled:hover{
+  box-shadow: 0 0 10px #95a5a6;
+}
+#logoutBtn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+#logoutBtn:disabled:hover{
+  box-shadow: 0 0 20px #95a5a6;
+}
 /* Items Grid */
 .lower-div {
   display: grid;
@@ -163,7 +184,7 @@ body {
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 1.25rem;
-  transition: all 0.3s ease;
+  transition: 0.3s ease;
   border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -171,10 +192,15 @@ body {
 }
 
 .item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(138, 43, 226, 0.2);
+  box-shadow: 0 1px 10px #892be281;
 }
-
+.item .button-box button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+.item .button-box button:disabled:hover{
+  box-shadow: 0 0 10px #95a5a6;
+}
 .item ul {
   list-style: none;
   margin-bottom: 1rem;
@@ -203,6 +229,17 @@ body {
 
 .button-box button {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.button-box button:nth-child(2){
+    background-color: #58afe9;
+    color: white;
+}
+.button-box button:nth-child(2):hover{
+    background-color: #149af3;
+    box-shadow: 0 0 10px #149af3;
 }
 
 /* Pagination */

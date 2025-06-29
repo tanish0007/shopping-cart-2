@@ -191,7 +191,7 @@ function addToDom(item, container) {
 
     const priceLi = document.createElement("li");
     priceLi.classList.add("itemPrice");
-    priceLi.innerHTML = `<strong>Price:</strong> $${item.price.toFixed(2)}`;
+    priceLi.innerHTML = `<strong>Price:</strong> &#8377;${item.price.toFixed(2)}`;
     ul.appendChild(priceLi);
 
     const descLi = document.createElement("li");
@@ -206,6 +206,7 @@ function addToDom(item, container) {
 
     const delBtn = document.createElement("button");
     delBtn.className = "button button-danger";
+    delBtn.classList.add("deleteBtn");
     delBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
     delBtn.addEventListener("click", () => {
         const confirmDelete = confirm(`Are you sure you want to delete "${item.name}"?`);
@@ -255,7 +256,7 @@ function addToDom(item, container) {
         }
 
         // disable other Delete buttons too..
-        const allDelBtns = document.querySelectorAll(".button-danger");
+        const allDelBtns = document.querySelectorAll(".deleteBtn");
         if(allDelBtns){
             allDelBtns.forEach(button => {
                 button.disabled = true;
