@@ -8,10 +8,28 @@ if(!loggedInUser || !loggedInUser.isAdmin) {
 }
 
 let items = JSON.parse(localStorage.getItem("items")) || [];
-const ITEMS_PER_PAGE = 12;
+
+function getItemsPerPage() {
+    if (window.innerWidth <= 480) { // Mobile
+        return 2;
+    } else if (window.innerWidth <= 768) { // Tablet
+        return 4;
+    } else if (window.innerWidth <= 1024) { // Small desktop
+        return 6;
+    } else { // Large desktop
+        return 8;
+    }
+}
+
+let ITEMS_PER_PAGE = getItemsPerPage();
 let currentPage = 1;
 
 function initUI() {
+    window.addEventListener("resize", () => {
+        ITEMS_PER_PAGE = getItemsPerPage();
+        currentPage = 1;
+        renderItems();
+    })
     // Navigation
     const heading = document.createElement("h1");
     heading.textContent = `Welcome ${loggedInUser.name}`;
