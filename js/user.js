@@ -9,18 +9,15 @@ if (!loggedInUser.id) {
 let items = JSON.parse(localStorage.getItem("items")) || [];
 const users = JSON.parse(localStorage.getItem("users")) || [];
 
-// Ensure user has required properties
 if (!loggedInUser.cart) loggedInUser.cart = [];
 if (!loggedInUser.wishlist) loggedInUser.wishlist = [];
 
 let showingCart = false;
 let showingWishlist = false;
 
-// Initialize UI
 function initUI() {
-    // Navigation
     const heading = document.createElement("h1");
-    heading.innerHTML = `<i class="fas fa-user-circle"></i> Welcome ${loggedInUser.name || 'User'}`;
+    heading.innerHTML = `Welcome ${loggedInUser.name || 'User'}`;
     nav.appendChild(heading);
 
     const sideNav = document.createElement("div");
@@ -32,12 +29,13 @@ function initUI() {
     
     const wishlistBtn = document.createElement("button");
     wishlistBtn.className = `button ${showingWishlist ? 'active' : ''}`;
-    wishlistBtn.innerHTML = '<i class="fas fa-heart"></i> Wishlist';
+    wishlistBtn.innerHTML = '<i class="fas fa-heart" style="color: red"></i> Wishlist';
     wishlistBtn.addEventListener("click", toggleWishlist);
     wishlistBtnContainer.appendChild(wishlistBtn);
     
     const wishlistCounter = document.createElement("span");
     wishlistCounter.className = "nav-counter";
+    wishlistCounter.id = "wishlistCount";
     wishlistCounter.textContent = loggedInUser.wishlist.length;
     wishlistBtnContainer.appendChild(wishlistCounter);
     sideNav.appendChild(wishlistBtnContainer);
@@ -48,12 +46,13 @@ function initUI() {
     
     const cartBtn = document.createElement("button");
     cartBtn.className = `button ${showingCart ? 'active' : ''}`;
-    cartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Cart';
+    cartBtn.innerHTML = '<i class="fas fa-shopping-cart" style="color: blue"></i> Cart';
     cartBtn.addEventListener("click", toggleCart);
     cartBtnContainer.appendChild(cartBtn);
     
     const cartCounter = document.createElement("span");
     cartCounter.className = "nav-counter";
+    cartCounter.id = "cartCount";
     cartCounter.textContent = loggedInUser.cart.reduce((total, item) => total + item.quantity, 0);
     cartBtnContainer.appendChild(cartCounter);
     sideNav.appendChild(cartBtnContainer);
@@ -73,23 +72,20 @@ function initUI() {
     renderItems();
 }
 
-// Toggle wishlist view
 function toggleWishlist() {
     showingWishlist = !showingWishlist;
     showingCart = false;
-    renderItems();
     updateNavButtons();
+    renderItems();
 }
 
-// Toggle cart view
 function toggleCart() {
     showingCart = !showingCart;
     showingWishlist = false;
-    renderItems();
     updateNavButtons();
+    renderItems();
 }
 
-// Update nav buttons state
 function updateNavButtons() {
     const wishlistBtn = document.querySelector('.side-nav .fa-heart').closest('button');
     const cartBtn = document.querySelector('.side-nav .fa-shopping-cart').closest('button');
@@ -98,19 +94,16 @@ function updateNavButtons() {
     cartBtn.classList.toggle('active', showingCart);
 }
 
-// Update counters in nav
 function updateNavCounters() {
-    document.querySelector('.fa-heart').nextElementSibling.textContent = loggedInUser.wishlist.length;
-    document.querySelector('.fa-shopping-cart').nextElementSibling.textContent = 
-        loggedInUser.cart.reduce((total, item) => total + item.quantity, 0);
+    document.querySelector('#wishlistCount').textContent = loggedInUser.wishlist.length;
+    document.querySelector('#cartCount').textContent = loggedInUser.cart.reduce((total, item) => total + item.quantity, 0);
+    // console.log(document.querySelector('#wishlistCount').textContent);
 }
 
-// Render items
 function renderItems() {
     const lowerDiv = document.createElement("div");
     lowerDiv.className = "lower-div";
     
-    // Clear existing items
     const existingLowerDiv = document.querySelector(".lower-div");
     if(existingLowerDiv) existingLowerDiv.remove();
 
@@ -175,10 +168,17 @@ function addToDom(item, container) {
     wishlistBtn.className = "wishlist-btn";
     wishlistBtn.innerHTML = '<i class="fas fa-heart"></i>';
     wishlistBtn.classList.toggle("active", loggedInUser.wishlist.includes(item.id));
+
     wishlistBtn.addEventListener("click", (e) => {
+        // debugger;
         const isActive = e.currentTarget.classList.contains("active");
         e.currentTarget.classList.toggle("active", !isActive);
         toggleWishlistItem(item.id);
+
+        // const wishlistCount = document.querySelector("#wishlistCount");
+        // console.log(wishlistCount.textContent);
+
+        // wishlistCount.textContent = parseInt(wishlistCount.textContent) + 1;
     });
     btnBox.appendChild(wishlistBtn);
 
@@ -207,7 +207,6 @@ function addToDom(item, container) {
     container.appendChild(div);
 }
 
-// Toggle item in wishlist
 function toggleWishlistItem(itemId) {
     const index = loggedInUser.wishlist.indexOf(itemId);
     if (index === -1) {
@@ -220,7 +219,6 @@ function toggleWishlistItem(itemId) {
     renderItems();
 }
 
-// Add item to cart
 function addToCart(itemId) {
     const existingItem = loggedInUser.cart.find(item => item.id === itemId);
     
@@ -245,7 +243,6 @@ function addToCart(itemId) {
     renderItems();
 }
 
-// Remove item from cart
 function removeFromCart(itemId) {
     loggedInUser.cart = loggedInUser.cart.filter(item => item.id !== itemId);
     updateUserData();

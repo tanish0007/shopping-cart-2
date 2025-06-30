@@ -1,11 +1,11 @@
 /* User Dashboard Styles */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
 :root {
   --primary-color: #8a2be2;
   --primary-light: #9c4dff;
-  --danger-color: #e74c3c;
+  --danger-color: #e74c3c;  
   --success-color: #2ecc71;
   --dark-color: #1a1a2e;
   --light-color: #f8f9fa;
@@ -66,6 +66,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: "Great Vibes";
 }
 
 .nav h1 i {
