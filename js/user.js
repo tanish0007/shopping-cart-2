@@ -2,6 +2,9 @@ const nav = document.querySelector(".nav");
 const itemsBox = document.querySelector(".items-box");
 const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser")) || {};
 
+let currentPage = 1;
+let itemsPerPage = 8;
+
 if (!loggedInUser.id) {
     window.location.href = "index.html";
 }
@@ -14,6 +17,57 @@ if (!loggedInUser.wishlist) loggedInUser.wishlist = [];
 
 let showingCart = false;
 let showingWishlist = false;
+
+// Add this function to calculate total pages
+function calculateTotalPages(itemsToDisplay) {
+    if (itemsToDisplay.length % itemsPerPage === 0) {
+        return itemsToDisplay.length / itemsPerPage;
+    } else {
+        return Math.floor(itemsToDisplay.length / itemsPerPage) + 1;
+    }
+}
+
+// Add this function to get items for current page
+function getItemsForCurrentPage(itemsToDisplay) {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, itemsToDisplay.length);
+    return itemsToDisplay.slice(startIndex, endIndex);
+}
+
+// Add this function to render pagination controls
+function renderPaginationControls(totalPages) {
+    const paginationDiv = document.createElement("div");
+    paginationDiv.className = "pagination-controls";
+
+    const prevButton = document.createElement("button");
+    prevButton.innerHTML = "&laquo;";
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderItems();
+        }
+    });
+
+    const pageInfo = document.createElement("span");
+    pageInfo.textContent = `Page ${currentPage}/${totalPages}`;
+
+    const nextButton = document.createElement("button");
+    nextButton.innerHTML = "&raquo;";
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.addEventListener("click", () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderItems();
+        }
+    });
+
+    paginationDiv.appendChild(prevButton);
+    paginationDiv.appendChild(pageInfo);
+    paginationDiv.appendChild(nextButton);
+
+    return paginationDiv;
+}
 
 function initUI() {
     const heading = document.createElement("h1");
@@ -75,6 +129,7 @@ function initUI() {
 function toggleWishlist() {
     showingWishlist = !showingWishlist;
     showingCart = false;
+    currentPage = 1; // Reset to first page when switching views
     updateNavButtons();
     renderItems();
 }
@@ -82,6 +137,7 @@ function toggleWishlist() {
 function toggleCart() {
     showingCart = !showingCart;
     showingWishlist = false;
+    currentPage = 1; // Reset to first page when switching views
     updateNavButtons();
     renderItems();
 }
@@ -97,7 +153,6 @@ function updateNavButtons() {
 function updateNavCounters() {
     document.querySelector('#wishlistCount').textContent = loggedInUser.wishlist.length;
     document.querySelector('#cartCount').textContent = loggedInUser.cart.reduce((total, item) => total + item.quantity, 0);
-    // console.log(document.querySelector('#wishlistCount').textContent);
 }
 
 function renderItems() {
@@ -120,7 +175,10 @@ function renderItems() {
         itemsToDisplay = [...items];
     }
 
-    if(itemsToDisplay.length === 0) {
+    const totalPages = calculateTotalPages(itemsToDisplay);
+    const paginatedItems = getItemsForCurrentPage(itemsToDisplay);
+
+    if(paginatedItems.length === 0) {
         const noItemsMsg = document.createElement("div");
         noItemsMsg.className = "no-items";
         noItemsMsg.textContent = showingCart ? "Your cart is empty" : 
@@ -128,9 +186,14 @@ function renderItems() {
                                 "No items available";
         lowerDiv.appendChild(noItemsMsg);
     } else {
-        itemsToDisplay.forEach(item => {
+        paginatedItems.forEach(item => {
             addToDom(item, lowerDiv);
         });
+
+        if (totalPages > 1) {
+            const paginationControls = renderPaginationControls(totalPages);
+            lowerDiv.appendChild(paginationControls);
+        }
     }
 
     itemsBox.appendChild(lowerDiv);
@@ -263,3 +326,27 @@ function updateUserData() {
 
 // Initialize the page
 document.addEventListener("DOMContentLoaded", initUI);
+
+
+/*
+    i want to add pagination in it such that 
+    no. of pages will be divided such that if 
+    items per page = 8;
+    if( items.length % 8 === 0) totalNoOfPage = items.length / items per page;
+    else totalNoOfPage = ( items.length / items per page ) + 1;
+
+    suppose having 18 items
+    loop would be like this..
+    first page(1)
+        (itemsPerPage*0) to (itemsPerPage*1) -1;
+    second page (2)
+        (itemsPerPage*1) to (itemsPerPage*2) -1;
+    third page (3) is last page ? yes 
+        (itemsPerPage*2) to items.length-1;
+
+
+    and this moving between buttons will happen by two arrow buttons on first page pevPage button will be disabled 
+    and on last page nextPage button will be disabled.
+    and between these buttons page number should be displayed like this
+    < Page 1/totalPages >
+*/
