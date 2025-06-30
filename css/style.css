@@ -23,6 +23,7 @@ body {
     max-width: 500px;
     margin: 2rem auto;
     padding: 2rem;
+    transition: .3s ease;
 }
 
 .container:hover {
@@ -36,75 +37,6 @@ body {
     font-family: "Great Vibes", sans-serif;
 }
 
-
-/* other */
-.nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 1rem;
-}
-
-.button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s ease;
-}
-
-.button-primary {
-    background-color: #8a2be2;
-    color: white;
-}
-
-.button-primary:hover {
-    box-shadow: 0 0 10px #8a2be2;
-}
-
-.button-danger {
-    background-color: #f05c4c;
-    color: white;
-}
-
-.button-danger:hover {
-    background-color: #ff1900;
-    box-shadow: 0 0 5px #ff1900;
-}
-
-.button-success {
-    background-color: rgb(56, 238, 71);
-    color: white;
-}
-
-.button-success:hover {
-    background-color: #07e263;
-    box-shadow: 0 0 10px #07e263;
-}
-
-.pagination {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-}
-
-.pagination button {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ddd;
-    background-color: white;
-    cursor: pointer;
-}
-
-.pagination button.active {
-    background-color: #8a2be2;
-    color: white;
-    border-color: #8a2be2;
-}
-
 /* Responsive styles */
 @media (max-width: 768px) {
     .container {
@@ -112,14 +44,6 @@ body {
         padding: 1rem;
     }
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -164,6 +88,9 @@ form.tab label {
 form.tab label:nth-child(2), form.tab label:nth-child(3){
     margin-top: 1.2rem;
 }
+form.tab label:nth-child(4) {
+    margin-top: .5rem;
+}
 
 form.tab input[type="text"],
 form.tab input[type="email"],
@@ -185,7 +112,7 @@ form.tab button {
     /* margin-top: 1rem; */
     width: fit-content;
     place-self: center;
-    margin-top: 2rem;
+    margin-top: 10px;
     padding: 12px 30px;
     border: none;
     font-size: 20px;
@@ -206,4 +133,6 @@ form.tab button:hover {
     font-size: 1rem;
     margin-top: -0.5rem;
     font-weight: 700;
+    margin-top: 10px;
+    /* text-align: center; */
 }
