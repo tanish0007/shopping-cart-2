@@ -1,6 +1,5 @@
 const nav = document.querySelector(".nav");
 const itemsBox = document.querySelector(".items-box");
-const pagination = document.querySelector(".pagination");
 const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser")) || {};
 
 if (!loggedInUser.id) {
@@ -14,26 +13,11 @@ const users = JSON.parse(localStorage.getItem("users")) || [];
 if (!loggedInUser.cart) loggedInUser.cart = [];
 if (!loggedInUser.wishlist) loggedInUser.wishlist = [];
 
-function getItemsPerPage() {
-    if (window.innerWidth <= 480) return 2;
-    if (window.innerWidth <= 768) return 4;
-    if (window.innerWidth <= 1024) return 6;
-    return 8;
-}
-
-let ITEMS_PER_PAGE = getItemsPerPage();
-let currentPage = 1;
 let showingCart = false;
 let showingWishlist = false;
 
 // Initialize UI
 function initUI() {
-    window.addEventListener("resize", () => {
-        ITEMS_PER_PAGE = getItemsPerPage();
-        currentPage = 1;
-        renderItems();
-    });
-
     // Navigation
     const heading = document.createElement("h1");
     heading.innerHTML = `<i class="fas fa-user-circle"></i> Welcome ${loggedInUser.name || 'User'}`;
@@ -93,7 +77,6 @@ function initUI() {
 function toggleWishlist() {
     showingWishlist = !showingWishlist;
     showingCart = false;
-    currentPage = 1;
     renderItems();
     updateNavButtons();
 }
@@ -102,7 +85,6 @@ function toggleWishlist() {
 function toggleCart() {
     showingCart = !showingCart;
     showingWishlist = false;
-    currentPage = 1;
     renderItems();
     updateNavButtons();
 }
@@ -123,7 +105,7 @@ function updateNavCounters() {
         loggedInUser.cart.reduce((total, item) => total + item.quantity, 0);
 }
 
-// Render items with pagination
+// Render items
 function renderItems() {
     const lowerDiv = document.createElement("div");
     lowerDiv.className = "lower-div";
@@ -145,17 +127,7 @@ function renderItems() {
         itemsToDisplay = [...items];
     }
 
-    let totalPages = Math.ceil(itemsToDisplay.length / ITEMS_PER_PAGE);
-    if (totalPages === 0) totalPages = 1; // Always at least 1 page
-    
-    // Ensure currentPage is within valid range
-    if (currentPage > totalPages) currentPage = totalPages;
-    if (currentPage < 1) currentPage = 1;
-    
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const paginatedItems = itemsToDisplay.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-    if(paginatedItems.length === 0) {
+    if(itemsToDisplay.length === 0) {
         const noItemsMsg = document.createElement("div");
         noItemsMsg.className = "no-items";
         noItemsMsg.textContent = showingCart ? "Your cart is empty" : 
@@ -163,13 +135,12 @@ function renderItems() {
                                 "No items available";
         lowerDiv.appendChild(noItemsMsg);
     } else {
-        paginatedItems.forEach(item => {
+        itemsToDisplay.forEach(item => {
             addToDom(item, lowerDiv);
         });
     }
 
     itemsBox.appendChild(lowerDiv);
-    renderPagination(totalPages);
 }
 
 function addToDom(item, container) {
@@ -178,14 +149,6 @@ function addToDom(item, container) {
     div.classList.add("item");
 
     const ul = document.createElement("ul");
-
-    const imageLi = document.createElement("li");
-    imageLi.classList.add("itemImage");
-    const img = document.createElement("img");
-    img.src = item.image || "https://via.placeholder.com/150?text=No+Image";
-    img.alt = item.name;
-    imageLi.appendChild(img);
-    ul.appendChild(imageLi);
 
     const nameLi = document.createElement("li");
     nameLi.classList.add("itemName");
@@ -207,7 +170,7 @@ function addToDom(item, container) {
     const btnBox = document.createElement("div");
     btnBox.classList.add("button-box");
 
-    // Wishlist heart icon
+    // Wishlist button
     const wishlistBtn = document.createElement("button");
     wishlistBtn.className = "wishlist-btn";
     wishlistBtn.innerHTML = '<i class="fas fa-heart"></i>';
@@ -254,7 +217,7 @@ function toggleWishlistItem(itemId) {
     }
     updateUserData();
     updateNavCounters();
-    renderItems(); // Force UI refresh
+    renderItems();
 }
 
 // Add item to cart
@@ -279,7 +242,7 @@ function addToCart(itemId) {
         }
     }
     
-    renderItems(); // Force UI refresh
+    renderItems();
 }
 
 // Remove item from cart
@@ -287,7 +250,7 @@ function removeFromCart(itemId) {
     loggedInUser.cart = loggedInUser.cart.filter(item => item.id !== itemId);
     updateUserData();
     updateNavCounters();
-    renderItems(); // Force UI refresh
+    renderItems();
 }
 
 // Update user data
@@ -299,92 +262,6 @@ function updateUserData() {
         localStorage.setItem("users", JSON.stringify(users));
         sessionStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
     }
-}
-
-// Render pagination
-function renderPagination(totalPages) {
-    pagination.innerHTML = '';
-
-    if(totalPages <= 1) return;
-
-    const prevBtn = document.createElement("button");
-    prevBtn.className = "pagination-btn";
-    prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-    prevBtn.disabled = currentPage === 1;
-    prevBtn.addEventListener("click", () => {
-        if(currentPage > 1) {
-            currentPage--;
-            renderItems();
-        }
-    });
-    pagination.appendChild(prevBtn);
-
-    const maxVisible = 5;
-    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    let end = Math.min(totalPages, start + maxVisible - 1);
-
-    if (end - start + 1 < maxVisible) {
-        start = Math.max(1, end - maxVisible + 1);
-    }
-
-    if (start > 1) {
-        const firstBtn = document.createElement("button");
-        firstBtn.className = "pagination-btn";
-        firstBtn.textContent = "1";
-        firstBtn.addEventListener("click", () => {
-            currentPage = 1;
-            renderItems();
-        });
-        pagination.appendChild(firstBtn);
-
-        if (start > 2) {
-            const ellipsis = document.createElement("span");
-            ellipsis.className = "pagination-ellipsis";
-            ellipsis.textContent = "...";
-            pagination.appendChild(ellipsis);
-        }
-    }
-
-    for (let i = start; i <= end; i++) {
-        const pageBtn = document.createElement("button");
-        pageBtn.className = `pagination-btn ${currentPage === i ? "active" : ""}`;
-        pageBtn.textContent = i;
-        pageBtn.addEventListener("click", () => {
-            currentPage = i;
-            renderItems();
-        });
-        pagination.appendChild(pageBtn);
-    }
-
-    if (end < totalPages) {
-        if (end < totalPages - 1) {
-            const ellipsis = document.createElement("span");
-            ellipsis.className = "pagination-ellipsis";
-            ellipsis.textContent = "...";
-            pagination.appendChild(ellipsis);
-        }
-
-        const lastBtn = document.createElement("button");
-        lastBtn.className = "pagination-btn";
-        lastBtn.textContent = totalPages;
-        lastBtn.addEventListener("click", () => {
-            currentPage = totalPages;
-            renderItems();
-        });
-        pagination.appendChild(lastBtn);
-    }
-
-    const nextBtn = document.createElement("button");
-    nextBtn.className = "pagination-btn";
-    nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-    nextBtn.disabled = currentPage === totalPages;
-    nextBtn.addEventListener("click", () => {
-        if(currentPage < totalPages) {
-            currentPage++;
-            renderItems();
-        }
-    });
-    pagination.appendChild(nextBtn);
 }
 
 // Initialize the page

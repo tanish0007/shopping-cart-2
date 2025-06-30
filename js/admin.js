@@ -1,6 +1,5 @@
 const nav = document.querySelector(".nav");
 const itemsBox = document.querySelector(".items-box");
-const pagination = document.querySelector(".pagination");
 const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
 
 if(!loggedInUser || !loggedInUser.isAdmin) {
@@ -13,24 +12,8 @@ if (!localStorage.getItem("items")) {
     items = [];
 }
 
-function getItemsPerPage() {
-    if (window.innerWidth <= 480) return 2;    // Mobile
-    if (window.innerWidth <= 768) return 4;    // Tablet
-    if (window.innerWidth <= 1024) return 6;
-    return 8;                                  // Desktop
-}
-
-let ITEMS_PER_PAGE = getItemsPerPage();
-let currentPage = 1;
-
 // Initialize UI
 function initUI() {
-    window.addEventListener("resize", () => {
-        ITEMS_PER_PAGE = getItemsPerPage();
-        currentPage = 1;
-        renderItems();
-    });
-
     // Navigation
     const heading = document.createElement("h1");
     heading.innerHTML = `Welcome ${loggedInUser.name}`;
@@ -155,21 +138,15 @@ function renderItems() {
     const existingLowerDiv = document.querySelector(".lower-div");
     if(existingLowerDiv) existingLowerDiv.remove();
 
-    // Calculate pagination
-    const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-    if(paginatedItems.length === 0) {
+    if(items.length === 0) {
         lowerDiv.textContent = "No items found";
     } else {
-        paginatedItems.forEach(item => {
+        items.forEach(item => {
             addToDom(item, lowerDiv);
         });
     }
 
     itemsBox.appendChild(lowerDiv);
-    renderPagination(totalPages);
 }
 
 function addToDom(item, container) {
@@ -342,94 +319,6 @@ function addToDom(item, container) {
 
     div.appendChild(btnBox);
     container.appendChild(div);
-}
-
-function renderPagination(totalPages) {
-    pagination.innerHTML = '';
-
-    if(totalPages <= 1) return;
-
-    // Previous button
-    const prevBtn = document.createElement("button");
-    prevBtn.className = "pagination-btn";
-    prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-    prevBtn.disabled = currentPage === 1;
-    prevBtn.addEventListener("click", () => {
-        if(currentPage > 1) {
-            currentPage--;
-            renderItems();
-        }
-    });
-    pagination.appendChild(prevBtn);
-
-    // Page buttons
-    const maxVisible = 5;
-    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    let end = Math.min(totalPages, start + maxVisible - 1);
-
-    if (end - start + 1 < maxVisible) {
-        start = Math.max(1, end - maxVisible + 1);
-    }
-
-    if (start > 1) {
-        const firstBtn = document.createElement("button");
-        firstBtn.className = "pagination-btn";
-        firstBtn.textContent = "1";
-        firstBtn.addEventListener("click", () => {
-            currentPage = 1;
-            renderItems();
-        });
-        pagination.appendChild(firstBtn);
-
-        if (start > 2) {
-            const ellipsis = document.createElement("span");
-            ellipsis.className = "pagination-ellipsis";
-            ellipsis.textContent = "...";
-            pagination.appendChild(ellipsis);
-        }
-    }
-
-    for (let i = start; i <= end; i++) {
-        const pageBtn = document.createElement("button");
-        pageBtn.className = `pagination-btn ${currentPage === i ? "active" : ""}`;
-        pageBtn.textContent = i;
-        pageBtn.addEventListener("click", () => {
-            currentPage = i;
-            renderItems();
-        });
-        pagination.appendChild(pageBtn);
-    }
-
-    if (end < totalPages) {
-        if (end < totalPages - 1) {
-            const ellipsis = document.createElement("span");
-            ellipsis.className = "pagination-ellipsis";
-            ellipsis.textContent = "...";
-            pagination.appendChild(ellipsis);
-        }
-
-        const lastBtn = document.createElement("button");
-        lastBtn.className = "pagination-btn";
-        lastBtn.textContent = totalPages;
-        lastBtn.addEventListener("click", () => {
-            currentPage = totalPages;
-            renderItems();
-        });
-        pagination.appendChild(lastBtn);
-    }
-
-    // Next button
-    const nextBtn = document.createElement("button");
-    nextBtn.className = "pagination-btn";
-    nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-    nextBtn.disabled = currentPage === totalPages;
-    nextBtn.addEventListener("click", () => {
-        if(currentPage < totalPages) {
-            currentPage++;
-            renderItems();
-        }
-    });
-    pagination.appendChild(nextBtn);
 }
 
 // Initialize the page
