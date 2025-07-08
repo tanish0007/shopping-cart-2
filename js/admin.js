@@ -168,7 +168,7 @@ function addToDom(item, container) {
 
     const priceLi = document.createElement("li");
     priceLi.classList.add("itemPrice");
-    priceLi.innerHTML = `<strong>Price:</strong> &#8377;${item.price.toFixed(2)}`;
+    priceLi.innerHTML = `<strong>Price:</strong> &#8377;${item.price}`;
     ul.appendChild(priceLi);
 
     const descLi = document.createElement("li");
