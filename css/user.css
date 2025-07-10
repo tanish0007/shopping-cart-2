@@ -1,4 +1,3 @@
-/* User Dashboard Styles */
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
@@ -45,7 +44,6 @@ body {
   box-shadow: 0 10px 40px rgba(138, 43, 226, 0.4);
 }
 
-/* Navigation */
 .nav {
   display: flex;
   justify-content: space-between;
@@ -104,7 +102,6 @@ body {
   font-weight: bold;
 }
 
-/* Buttons */
 .button {
   padding: 0.625rem 1.25rem;
   border: none;
@@ -174,7 +171,6 @@ body {
   outline: none;
 }
 
-/* Main content */
 .content {
   padding: 20px;
 }
@@ -257,7 +253,6 @@ body {
   border: 2px dashed var(--primary-light);
 }
 
-/* Pagination */
 .pagination-controls{
   width: 100%;
   display: flex;
@@ -295,7 +290,37 @@ body {
   cursor: not-allowed;
 }
 
-/* Responsive Design */
+.item.out-of-stock {
+    position: relative;
+    opacity: 0.7;
+    filter: grayscale(70%);
+}
+
+.item.out-of-stock::after {
+    content: "Out of Stock";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--danger-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.button.disabled {
+    background-color: #cccccc !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.button.disabled:hover {
+    background-color: #cccccc !important;
+}
+
 @media (max-width: 480px) {
   body {
     padding: 0.625rem;

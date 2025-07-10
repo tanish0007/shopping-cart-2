@@ -1,6 +1,6 @@
 const nav = document.querySelector(".nav");
 const itemsBox = document.querySelector(".items-box");
-const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
 if(!loggedInUser || !loggedInUser.isAdmin) {
     window.location.href = "index.html";
@@ -16,7 +16,7 @@ if (!localStorage.getItem("items")) {
 function initUI() {
     // Navigation
     const heading = document.createElement("h1");
-    heading.innerHTML = `Welcome ${loggedInUser.name}`;
+    heading.innerHTML = `Welcome ${loggedInUser.username}`;
     nav.appendChild(heading);
 
     const sideNav = document.createElement("div");
@@ -33,7 +33,7 @@ function initUI() {
     logoutBtn.id = "logoutBtn";
     logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
     logoutBtn.addEventListener("click", () => {
-        sessionStorage.removeItem("loggedInUser");
+        localStorage.removeItem("loggedInUser");
         window.location.href = "index.html";
     });
     sideNav.appendChild(logoutBtn);
@@ -321,5 +321,9 @@ function addToDom(item, container) {
     container.appendChild(div);
 }
 
-// Initialize the page
 initUI();
+
+window.addEventListener('focus', function() {
+    window.location.reload();
+});
+

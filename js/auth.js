@@ -19,6 +19,11 @@ function clearForm() {
     tab.innerHTML = '';
 }
 
+function validateEmail(email) {
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return re.test(String(email).toLowerCase());
+}
+
 function showLoginForm() {
     clearForm();
 
@@ -66,14 +71,18 @@ function showLoginForm() {
             return;
         }
 
+        if (!validateEmail(userEmail.value)) {
+            errorText.innerText = "Please enter a valid email address";
+            return;
+        }
+
         const existingUser = users.find(user => 
             user.email === userEmail.value && user.password === userPassword.value
         );
 
         if(existingUser) {
-            sessionStorage.setItem("loggedInUser", JSON.stringify(existingUser));
+            localStorage.setItem("loggedInUser", JSON.stringify(existingUser));
             
-            // this time we are going to redirect them on different pages..
             if(existingUser.isAdmin) {
                 window.location.href = "admin.html";
             } else {
@@ -154,6 +163,11 @@ function showSignUpForm() {
             return;
         }
 
+        if (!validateEmail(userEmail.value)) {
+            errorText.innerText = "Please enter a valid email address";
+            return;
+        }
+
         const userExists = users.some(user =>
             user.email.toLowerCase() === userEmail.value.toLowerCase()
         );
@@ -179,7 +193,6 @@ function showSignUpForm() {
         errorText.innerText = "Signup Successful! Redirecting to login page...";
         errorText.style.color = "green";
         
-        // after 2sec will redirect to login fotm
         setTimeout(() => {
             loginTab.checked = true;
             showLoginForm();
@@ -196,7 +209,17 @@ signUpTab.addEventListener("change", () => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
-    if (loginTab.checked) {
-        showLoginForm();
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    
+    if (loggedInUser) {
+        if (loggedInUser.isAdmin) {
+            window.location.href = "admin.html";
+        } else {
+            window.location.href = "user.html";
+        }
+    } else {
+        if (loginTab.checked) {
+            showLoginForm();
+        }
     }
 });
